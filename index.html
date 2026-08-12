@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHAURYA AETERNA | Digital Sanctuary & Environments</title>
+    <meta name="description" content="A cinematic luxury digital dream world exploring heavenly landscapes, atmospheric light, and natural tranquility by Shaurya.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           1. CSS VARIABLES & CORE RESET
+           ============================================================ */
+        :root {
+            --obsidian: #050507;
+            --ivory: #F7F3EE;
+            --gold: #D4AF37;
+            --sandstone: #E2C4A8;
+            --rose-gold: #E8B4B8;
+            --soft-blue: #9BB8CD;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            
+            --ui-transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--obsidian);
+            color: var(--ivory);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* Hide scrollbar for seamless immersion */
+        body::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ============================================================
+           2. CANVAS & SCROLL TIMELINE
+           ============================================================ */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .scroll-proxy {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1200vh; /* Master timeline scroll height */
+            z-index: 1;
+        }
+
+        /* ============================================================
+           3. LUXURY EDITORIAL UI & HEADERS
+           ============================================================ */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+            transition: var(--ui-transition);
+        }
+
+        .brand-logo {
+            font-family: var(--font-serif);
+            font-size: 1.6rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            font-weight: 300;
+            pointer-events: auto;
+            cursor: pointer;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            pointer-events: auto;
+        }
+
+        .btn-glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--ivory);
+            padding: 0.6rem 1.6rem;
+            border-radius: 50px;
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--ui-transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-glass.active {
+            background: var(--ivory);
+            color: var(--obsidian);
+            border-color: var(--ivory);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        /* HUD - Bottom Environment Indicator */
+        #hud-environment {
+            position: fixed;
+            bottom: 3rem;
+            left: 4rem;
+            z-index: 100;
+            pointer-events: none;
+            transition: var(--ui-transition);
+        }
+
+        .env-number {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .env-title {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+        }
+
+        .env-subtitle {
+            font-family: var(--font-sans);
+            font-size: 0.75rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            opacity: 0.8;
+            margin-top: 0.4rem;
+            max-width: 360px;
+            line-height: 1.6;
+        }
+
+        /* Scrubber / Quick Environment Menu */
+        #hud-nav-dots {
+            position: fixed;
+            right: 4rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .dot-item {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            cursor: pointer;
+            transition: var(--ui-transition);
+            position: relative;
+        }
+
+        .dot-item::after {
+            content: attr(data-title);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--font-sans);
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--ui-transition);
+            color: var(--ivory);
+            text-transform: uppercase;
+        }
+
+        .dot-item:hover::after { opacity: 1; transform: translateY(-50%) translateX(-5px); }
+        .dot-item.active { background: var(--ivory); border-color: var(--ivory); transform: scale(1.4); }
+
+        /* Audio Indicator Pulsing Dot */
+        .audio-pulse {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            display: inline-block;
+            transition: var(--ui-transition);
+        }
+        .audio-pulse.playing {
+            box-shadow: 0 0 10px var(--gold);
+            animation: audioPulseAnim 1.5s infinite ease-in-out;
+        }
+        @keyframes audioPulseAnim {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.6); opacity: 1; }
+        }
+
+        /* ============================================================
+           4. RELAXATION MODE OVERLAY
+           ============================================================ */
+        body.relax-mode header,
+        body.relax-mode #hud-nav-dots,
+        body.relax-mode .env-subtitle {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body.relax-mode #hud-environment {
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        body.relax-mode .env-title {
+            font-size: 2rem;
+            opacity: 0.6;
+        }
+
+        #relax-exit-btn {
+            position: fixed;
+            bottom: 3rem;
+            right: 4rem;
+            z-index: 101;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--ui-transition);
+        }
+
+        body.relax-mode #relax-exit-btn {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+           5. MEMORIAL / NARRATIVE TRIBUTE LAYER
+           ============================================================ */
+        #tribute-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 7, 0.92);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--ui-transition);
+        }
+
+        #tribute-modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tribute-card {
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            padding: 3rem;
+            position: relative;
+        }
+
+        .tribute-photo-frame {
+            width: 180px;
+            height: 240px;
+            margin: 0 auto 2rem;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .tribute-photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(40%) sepia(20%);
+        }
+
+        .tribute-name {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            color: var(--ivory);
+        }
+
+        .tribute-relation {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            color: var(--sandstone);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .tribute-quote {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-style: italic;
+            line-height: 1.7;
+            color: rgba(247, 243, 238, 0.85);
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-close-tribute {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--ivory);
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: var(--ui-transition);
+        }
+
+        .btn-close-tribute:hover {
+            background: var(--ivory);
+            color: var(--obsidian);
+        }
+
+        /* ============================================================
+           6. LOADING & FALLBACK OVERLAY
+           ============================================================ */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--obsidian);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .loader-title {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            letter-spacing: 0.3em;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .loader-sub {
+            font-family: var(--font-sans);
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            color: var(--sandstone);
+            text-transform: uppercase;
+            margin-bottom: 2.5rem;
+        }
+
+        .loader-progress-bar {
+            width: 220px;
+            height: 1px;
+            background: rgba(255,255,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-progress-fill {
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 0%;
+            background: var(--ivory);
+            transition: width 0.3s ease-out;
+        }
+
+        #fallback-ui {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--obsidian);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 2rem;
+        }
+        .no-webgl #fallback-ui { display: flex; }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            header { padding: 1.5rem 2rem; }
+            #hud-environment { bottom: 2rem; left: 2rem; }
+            .env-title { font-size: 2rem; }
+            #hud-nav-dots { right: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOADING SCREEN -->
+    <div id="loader">
+        <div class="loader-title">SHAURYA</div>
+        <div class="loader-sub">Digital Sanctuary & Environments</div>
+        <div class="loader-progress-bar">
+            <div class="loader-progress-fill" id="loader-fill"></div>
+        </div>
+    </div>
+
+    <!-- WEBGL CANVAS -->
+    <div id="webgl-container"></div>
+    <div class="scroll-proxy" id="scroll-proxy"></div>
+
+    <!-- UI HEADERS -->
+    <header>
+        <div class="brand-logo" id="logo-btn">SHAURYA</div>
+        <div class="nav-controls">
+            <button class="btn-glass" id="btn-tribute">MEMORIAL</button>
+            <button class="btn-glass" id="btn-relax">RELAX MODE</button>
+            <button class="btn-glass" id="btn-audio">
+                <span class="audio-pulse" id="audio-pulse"></span>
+                <span id="audio-label">SOUND OFF</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- HUD ENVIRONMENT DISPLAY -->
+    <div id="hud-environment">
+        <div class="env-number" id="env-number">01 / 08 SANCTUARY</div>
+        <div class="env-title" id="env-title">MOONLIT RIVER</div>
+        <div class="env-subtitle" id="env-subtitle">Crystal-clear waters reflecting a luminous moon. A quiet wooden bridge crosses into gentle tranquility.</div>
+    </div>
+
+    <!-- ENVIRONMENT QUICK SELECT SCRUBBER -->
+    <div id="hud-nav-dots">
+        <div class="dot-item active" data-index="0" data-title="Moonlit River"></div>
+        <div class="dot-item" data-index="1" data-title="Misty Forest"></div>
+        <div class="dot-item" data-index="2" data-title="Golden Meadow"></div>
+        <div class="dot-item" data-index="3" data-title="Cloud Ocean"></div>
+        <div class="dot-item" data-index="4" data-title="Desert Sunrise"></div>
+        <div class="dot-item" data-index="5" data-title="Snow Sanctuary"></div>
+        <div class="dot-item" data-index="6" data-title="Ocean Cliff"></div>
+        <div class="dot-item" data-index="7" data-title="Firefly Night"></div>
+    </div>
+
+    <!-- RELAX MODE EXIT BUTTON -->
+    <button class="btn-glass" id="relax-exit-btn">EXIT RELAX MODE</button>
+
+    <!-- TRIBUTE MODAL LAYER -->
+    <div id="tribute-modal">
+        <div class="tribute-card">
+            <div class="tribute-photo-frame">
+                <img src="Rakeshjpg.jpg" alt="Rakesh Goyal Ji — My Nana" id="tribute-img">
+            </div>
+            <div class="tribute-name">Rakesh Goyal Ji</div>
+            <div class="tribute-relation">My Nana · Sacred Memory</div>
+            <div class="tribute-quote">
+                “Some people become memories.<br>Some become part of the quiet light in who we are.”
+            </div>
+            <button class="btn-close-tribute" id="btn-close-tribute">RETURN TO SANCTUARY</button>
+        </div>
+    </div>
+
+    <!-- FALLBACK UI -->
+    <div id="fallback-ui">
+        <h1 style="font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 1rem;">SHAURYA AETERNA</h1>
+        <p style="font-size: 0.8rem; letter-spacing: 0.15em; opacity: 0.7;">WebGL hardware acceleration is required to render these digital environments.</p>
+    </div>
+
+    <!-- EXTERNAL LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- CUSTOM SHADERS -->
+    <script id="sky-vs" type="x-shader/x-vertex">
+        varying vec3 vWorldPosition;
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+            vWorldPosition = worldPosition.xyz;
+            gl_Position = projectionMatrix * viewMatrix * worldPosition;
+        }
+    </script>
+
+    <script id="sky-fs" type="x-shader/x-fragment">
+        uniform vec3 uSkyTop;
+        uniform vec3 uSkyBottom;
+        uniform vec3 uSunPosition;
+        uniform vec3 uSunColor;
+        uniform vec3 uMoonPosition;
+        uniform vec3 uMoonColor;
+        uniform float uStarOpacity;
+        uniform float uAuroraAlpha;
+        uniform float uTime;
+
+        varying vec3 vWorldPosition;
+        varying vec2 vUv;
+
+        // Simplex 2D noise for star/cloud/aurora patterns
+        vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+        float snoise(vec2 v){
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                               -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy) );
+            vec2 x0 = v - i + dot(i, C.xx);
+            vec2 i1;
+            i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod(i, 289.0);
+            vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+            + i.x + vec3(0.0, i1.x, 1.0 ));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+            m = m*m ;
+            m = m*m ;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+            vec3 g;
+            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+        }
+
+        void main() {
+            vec3 viewDir = normalize(vWorldPosition);
+            float h = normalize(vWorldPosition).y;
+            float factor = smoothstep(-0.2, 0.8, h);
+            
+            // Gradient Sky
+            vec3 skyColor = mix(uSkyBottom, uSkyTop, factor);
+
+            // Sun disc & volumetric glow
+            float sunDist = length(viewDir - normalize(uSunPosition));
+            float sunGlow = exp(-sunDist * 3.5);
+            skyColor += uSunColor * sunGlow * 1.2;
+
+            // Moon disc & atmospheric glow
+            float moonDist = length(viewDir - normalize(uMoonPosition));
+            float moonGlow = exp(-moonDist * 4.0);
+            if (moonDist < 0.06) {
+                skyColor = mix(skyColor, uMoonColor * 1.5, smoothstep(0.06, 0.05, moonDist));
+            }
+            skyColor += uMoonColor * moonGlow * 0.8;
+
+            // Procedural Stars
+            if (uStarOpacity > 0.01) {
+                float n = snoise(vUv * 300.0);
+                if (n > 0.88) {
+                    float twinkle = sin(uTime * 3.0 + n * 100.0) * 0.5 + 0.5;
+                    skyColor += vec3(0.9, 0.95, 1.0) * twinkle * uStarOpacity * smoothstep(0.1, 0.5, h);
+                }
+            }
+
+            // Aurora Bands
+            if (uAuroraAlpha > 0.01) {
+                float auroraN = snoise(vec2(vUv.x * 5.0 + uTime * 0.05, vUv.y * 2.0));
+                vec3 auroraColor = mix(vec3(0.1, 0.9, 0.5), vec3(0.5, 0.2, 0.9), auroraN * 0.5 + 0.5);
+                skyColor += auroraColor * smoothstep(0.2, 0.6, h) * (auroraN * 0.5 + 0.5) * uAuroraAlpha * 0.6;
+            }
+
+            gl_FragColor = vec4(skyColor, 1.0);
+        }
+    </script>
+
+    <!-- APPLICATION SCRIPT -->
+    <script>
+        /* ============================================================
+           1. CONFIG & DATA DEFINITIONS
+           ============================================================ */
+        const ENVIRONMENTS = [
+            {
+                id: "01",
+                title: "MOONLIT RIVER",
+                subtitle: "Crystal-clear waters reflecting a luminous moon. A quiet wooden bridge crosses into gentle tranquility.",
+                skyTop: new THREE.Color("#050B14"),
+                skyBottom: new THREE.Color("#1A2636"),
+                sunPos: new THREE.Vector3(0, -50, -100),
+                sunColor: new THREE.Color("#000000"),
+                moonPos: new THREE.Vector3(10, 35, -80),
+                moonColor: new THREE.Color("#E2EEF9"),
+                fogColor: new THREE.Color("#0D1B2A"),
+                starOpacity: 0.8,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#0A192F"),
+                waterAlpha: 0.85,
+                terrainType: "riverbank"
+            },
+            {
+                id: "02",
+                title: "MISTY FOREST",
+                subtitle: "Tall ancient trees bathed in dawn sunlight passing through soft morning moss and floating spores.",
+                skyTop: new THREE.Color("#1B2E24"),
+                skyBottom: new THREE.Color("#4A6B5B"),
+                sunPos: new THREE.Vector3(-20, 25, -60),
+                sunColor: new THREE.Color("#F3E5AB"),
+                moonPos: new THREE.Vector3(0, -50, -100),
+                moonColor: new THREE.Color("#000000"),
+                fogColor: new THREE.Color("#2D4A3E"),
+                starOpacity: 0.0,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#1A3323"),
+                waterAlpha: 0.6,
+                terrainType: "forest"
+            },
+            {
+                id: "03",
+                title: "GOLDEN MEADOW",
+                subtitle: "Endless tall grass moving gently in warm golden-hour breeze. Restorative atmospheric warmth.",
+                skyTop: new THREE.Color("#7A4B2A"),
+                skyBottom: new THREE.Color("#E8A87C"),
+                sunPos: new THREE.Vector3(0, 15, -70),
+                sunColor: new THREE.Color("#FFC857"),
+                moonPos: new THREE.Vector3(0, -50, -100),
+                moonColor: new THREE.Color("#000000"),
+                fogColor: new THREE.Color("#D48C56"),
+                starOpacity: 0.0,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#8A5A36"),
+                waterAlpha: 0.5,
+                terrainType: "meadow"
+            },
+            {
+                id: "04",
+                title: "CLOUD OCEAN",
+                subtitle: "Floating elevated sanctuary looking over a sea of rolling clouds and emerging mountain peaks.",
+                skyTop: new THREE.Color("#3D5A80"),
+                skyBottom: new THREE.Color("#98C1D9"),
+                sunPos: new THREE.Vector3(40, 30, -80),
+                sunColor: new THREE.Color("#FFF1E6"),
+                moonPos: new THREE.Vector3(0, -50, -100),
+                moonColor: new THREE.Color("#000000"),
+                fogColor: new THREE.Color("#BEE9E8"),
+                starOpacity: 0.1,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#3D5A80"),
+                waterAlpha: 0.2,
+                terrainType: "clouds"
+            },
+            {
+                id: "05",
+                title: "DESERT SUNRISE",
+                subtitle: "Quiet sandstone monoliths casting dramatic long shadows under a vibrant orange dawn horizon.",
+                skyTop: new THREE.Color("#5C2C35"),
+                skyBottom: new THREE.Color("#DF7A5E"),
+                sunPos: new THREE.Vector3(-30, 8, -60),
+                sunColor: new THREE.Color("#F2CC8F"),
+                moonPos: new THREE.Vector3(0, -50, -100),
+                moonColor: new THREE.Color("#000000"),
+                fogColor: new THREE.Color("#813D38"),
+                starOpacity: 0.0,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#5C2C35"),
+                waterAlpha: 0.1,
+                terrainType: "desert"
+            },
+            {
+                id: "06",
+                title: "SNOW SANCTUARY",
+                subtitle: "Silent winter landscape, soft snowfall, and warm comforting light from a distant architecture shelter.",
+                skyTop: new THREE.Color("#0D1B2A"),
+                skyBottom: new THREE.Color("#415A77"),
+                sunPos: new THREE.Vector3(0, -50, -100),
+                sunColor: new THREE.Color("#000000"),
+                moonPos: new THREE.Vector3(-20, 30, -70),
+                moonColor: new THREE.Color("#E0E1DD"),
+                fogColor: new THREE.Color("#1B263B"),
+                starOpacity: 0.7,
+                auroraAlpha: 0.8,
+                waterColor: new THREE.Color("#0D1B2A"),
+                waterAlpha: 0.9,
+                terrainType: "snow"
+            },
+            {
+                id: "07",
+                title: "OCEAN CLIFF",
+                subtitle: "Massive coastal cliffs over slow rolling ocean waves under a dramatic twilight sunset.",
+                skyTop: new THREE.Color("#2B1E3A"),
+                skyBottom: new THREE.Color("#85586F"),
+                sunPos: new THREE.Vector3(0, 5, -90),
+                sunColor: new THREE.Color("#AC7D88"),
+                moonPos: new THREE.Vector3(0, -50, -100),
+                moonColor: new THREE.Color("#000000"),
+                fogColor: new THREE.Color("#3E2C41"),
+                starOpacity: 0.3,
+                auroraAlpha: 0.0,
+                waterColor: new THREE.Color("#1F1D36"),
+                waterAlpha: 0.95,
+                terrainType: "cliff"
+            },
+            {
+                id: "08",
+                title: "FIREFLY NIGHT",
+                subtitle: "Deep violet nocturnal atmosphere where thousands of bio-luminescent fireflies drift organically.",
+                skyTop: new THREE.Color("#080710"),
+                skyBottom: new THREE.Color("#1D1836"),
+                sunPos: new THREE.Vector3(0, -50, -100),
+                sunColor: new THREE.Color("#000000"),
+                moonPos: new THREE.Vector3(0, 40, -80),
+                moonColor: new THREE.Color("#F4EEFF"),
+                fogColor: new THREE.Color("#120E24"),
+                starOpacity: 1.0,
+                auroraAlpha: 0.3,
+                waterColor: new THREE.Color("#080710"),
+                waterAlpha: 0.8,
+                terrainType: "firefly"
+            }
+        ];
+
+        /* ============================================================
+           2. PROCEDURAL SYNTH AUDIO ENGINE
+           ============================================================ */
+        class DynamicAudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+                this.masterGain = null;
+                this.noiseNode = null;
+                this.filterNode = null;
+                this.synthOsc = null;
+            }
+
+            init() {
+                if (this.ctx) return;
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+
+                this.masterGain = this.ctx.createGain();
+                this.masterGain.gain.value = 0.0;
+
+                // Ambient Noise Generator (Water & Wind synthesis)
+                const bufferSize = this.ctx.sampleRate * 2;
+                const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1; // Pink-ish white noise
+                }
+
+                this.noiseNode = this.ctx.createBufferSource();
+                this.noiseNode.buffer = noiseBuffer;
+                this.noiseNode.loop = true;
+
+                this.filterNode = this.ctx.createBiquadFilter();
+                this.filterNode.type = 'lowpass';
+                this.filterNode.frequency.value = 350;
+
+                this.noiseNode.connect(this.filterNode);
+                this.filterNode.connect(this.masterGain);
+
+                // Pure Sine Harmonic Drone for Spiritual Meditation
+                this.synthOsc = this.ctx.createOscillator();
+                this.synthGain = this.ctx.createGain();
+                this.synthOsc.type = 'sine';
+                this.synthOsc.frequency.value = 108.0; // Sacred frequency A/4
+                this.synthGain.gain.value = 0.15;
+
+                this.synthOsc.connect(this.synthGain);
+                this.synthGain.connect(this.masterGain);
+
+                this.masterGain.connect(this.ctx.destination);
+
+                this.noiseNode.start();
+                this.synthOsc.start();
+            }
+
+            toggle() {
+                if (!this.ctx) this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+
+                this.isPlaying = !this.isPlaying;
+                const label = document.getElementById('audio-label');
+                const pulse = document.getElementById('audio-pulse');
+                const btn = document.getElementById('btn-audio');
+
+                if (this.isPlaying) {
+                    gsap.to(this.masterGain.gain, { value: 0.35, duration: 2 });
+                    label.textContent = "SOUND ON";
+                    pulse.classList.add('playing');
+                    btn.classList.add('active');
+                } else {
+                    gsap.to(this.masterGain.gain, { value: 0.0, duration: 1.5 });
+                    label.textContent = "SOUND OFF";
+                    pulse.classList.remove('playing');
+                    btn.classList.remove('active');
+                }
+            }
+
+            updateForEnvironment(index) {
+                if (!this.ctx || !this.isPlaying) return;
+                // Modulate ambient filter frequencies based on environment mood
+                const freqs = [350, 600, 450, 800, 250, 300, 750, 200];
+                const synths = [108, 144, 162, 216, 96, 120, 128, 108];
+
+                gsap.to(this.filterNode.frequency, { value: freqs[index] || 350, duration: 3 });
+                gsap.to(this.synthOsc.frequency, { value: synths[index] || 108, duration: 4 });
+            }
+        }
+
+        const audioApp = new DynamicAudioEngine();
+
+        /* ============================================================
+           3. THREE.JS ENGINE & PROCEDURAL GEOMETRIES
+           ============================================================ */
+        class SanctuaryEngine {
+            constructor() {
+                this.container = document.getElementById('webgl-container');
+                this.scene = new THREE.Scene();
+                
+                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 4, 30);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.1;
+                this.container.appendChild(this.renderer.domElement);
+
+                this.clock = new THREE.Clock();
+                this.uniforms = {};
+                this.objects = {};
+
+                this.initScene();
+                window.addEventListener('resize', () => this.onResize());
+
+                this.render = this.render.bind(this);
+                gsap.ticker.add(this.render);
+            }
+
+            initScene() {
+                // Fog
+                this.scene.fog = new THREE.FogExp2(ENVIRONMENTS[0].fogColor, 0.012);
+
+                // Sky Dome Shader
+                const skyGeo = new THREE.SphereGeometry(400, 32, 32);
+                this.uniforms.sky = {
+                    uSkyTop: { value: ENVIRONMENTS[0].skyTop },
+                    uSkyBottom: { value: ENVIRONMENTS[0].skyBottom },
+                    uSunPosition: { value: ENVIRONMENTS[0].sunPos },
+                    uSunColor: { value: ENVIRONMENTS[0].sunColor },
+                    uMoonPosition: { value: ENVIRONMENTS[0].moonPos },
+                    uMoonColor: { value: ENVIRONMENTS[0].moonColor },
+                    uStarOpacity: { value: ENVIRONMENTS[0].starOpacity },
+                    uAuroraAlpha: { value: ENVIRONMENTS[0].auroraAlpha },
+                    uTime: { value: 0 }
+                };
+                const skyMat = new THREE.ShaderMaterial({
+                    vertexShader: document.getElementById('sky-vs').textContent,
+                    fragmentShader: document.getElementById('sky-fs').textContent,
+                    uniforms: this.uniforms.sky,
+                    side: THREE.BackSide
+                });
+                const skyMesh = new THREE.Mesh(skyGeo, skyMat);
+                this.scene.add(skyMesh);
+
+                // Water Surface Plane
+                const waterGeo = new THREE.PlaneGeometry(300, 300, 128, 128);
+                const waterMat = new THREE.MeshStandardMaterial({
+                    color: ENVIRONMENTS[0].waterColor,
+                    roughness: 0.1,
+                    metalness: 0.8,
+                    transparent: true,
+                    opacity: ENVIRONMENTS[0].waterAlpha,
+                    wireframe: false
+                });
+                const water = new THREE.Mesh(waterGeo, waterMat);
+                water.rotation.x = -Math.PI / 2;
+                water.position.y = -1;
+                this.scene.add(water);
+                this.objects.water = water;
+
+                // Terrain Mesh
+                const terrainGeo = new THREE.PlaneGeometry(300, 300, 128, 128);
+                // Displace vertices for organic hills/banks
+                const pos = terrainGeo.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    const y = pos.getY(i);
+                    const z = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 4.0 + Math.sin(x * 0.1) * 2.0;
+                    pos.setZ(i, z);
+                }
+                terrainGeo.computeVertexNormals();
+
+                const terrainMat = new THREE.MeshStandardMaterial({
+                    color: 0x1c2826,
+                    roughness: 0.9,
+                    metalness: 0.1,
+                    flatShading: true
+                });
+                const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+                terrain.rotation.x = -Math.PI / 2;
+                terrain.position.y = -4;
+                this.scene.add(terrain);
+                this.objects.terrain = terrain;
+
+                // Instanced Trees / Architectural Monoliths
+                const treeCount = 120;
+                const treeGeo = new THREE.ConeGeometry(1.5, 8, 5);
+                const treeMat = new THREE.MeshStandardMaterial({ color: 0x0D231A, roughness: 0.8 });
+                const trees = new THREE.InstancedMesh(treeGeo, treeMat, treeCount);
+                const dummy = new THREE.Object3D();
+
+                for (let i = 0; i < treeCount; i++) {
+                    const rx = (Math.random() - 0.5) * 220;
+                    const rz = (Math.random() - 0.5) * 220;
+                    if (Math.abs(rx) < 15 && Math.abs(rz) < 15) continue; // Keep clear pathway
+                    dummy.position.set(rx, 0, rz);
+                    const scale = 0.6 + Math.random() * 1.2;
+                    dummy.scale.set(scale, scale, scale);
+                    dummy.rotation.y = Math.random() * Math.PI;
+                    dummy.updateMatrix();
+                    trees.setMatrixAt(i, dummy.matrix);
+                }
+                this.scene.add(trees);
+                this.objects.trees = trees;
+
+                // Wooden Bridge Architecture
+                const bridgeGroup = new THREE.Group();
+                const plankMat = new THREE.MeshStandardMaterial({ color: 0x3D2817, roughness: 0.9 });
+                for(let i = -6; i <= 6; i++) {
+                    const plank = new THREE.Mesh(new THREE.BoxGeometry(4, 0.2, 0.8), plankMat);
+                    plank.position.set(0, Math.cos(i*0.2)*0.4, i * 0.9);
+                    bridgeGroup.add(plank);
+                }
+                bridgeGroup.position.set(0, -0.6, 5);
+                this.scene.add(bridgeGroup);
+                this.objects.bridge = bridgeGroup;
+
+                // Atmospheric Particles (Fireflies / Snow / Spores)
+                const partCount = 1500;
+                const partGeo = new THREE.BufferGeometry();
+                const partPos = new Float32Array(partCount * 3);
+                for(let i=0; i < partCount * 3; i += 3) {
+                    partPos[i] = (Math.random() - 0.5) * 150;
+                    partPos[i+1] = Math.random() * 30;
+                    partPos[i+2] = (Math.random() - 0.5) * 150;
+                }
+                partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
+                const partMat = new THREE.PointsMaterial({
+                    color: 0xFFF5EA,
+                    size: 0.2,
+                    transparent: true,
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending
+                });
+                const particles = new THREE.Points(partGeo, partMat);
+                this.scene.add(particles);
+                this.objects.particles = particles;
+
+                // Direct Light
+                const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                mainLight.position.copy(ENVIRONMENTS[0].moonPos);
+                this.scene.add(mainLight);
+                this.objects.mainLight = mainLight;
+
+                const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+                this.scene.add(ambient);
+                this.objects.ambient = ambient;
+            }
+
+            onResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            render() {
+                const time = this.clock.getElapsedTime();
+                this.uniforms.sky.uTime.value = time;
+
+                // Gentle water wave displacement
+                if (this.objects.water) {
+                    const pos = this.objects.water.geometry.attributes.position;
+                    for (let i = 0; i < pos.count; i += 4) {
+                        const u = pos.getX(i);
+                        const v = pos.getY(i);
+                        const z = Math.sin(u * 0.1 + time * 1.5) * 0.15 + Math.cos(v * 0.1 + time * 1.2) * 0.15;
+                        pos.setZ(i, z);
+                    }
+                    this.objects.water.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Particle floating organic motion
+                if (this.objects.particles) {
+                    const pos = this.objects.particles.geometry.attributes.position;
+                    for (let i = 1; i < pos.count * 3; i += 3) {
+                        pos.array[i] += Math.sin(time + pos.array[i-1]) * 0.01;
+                        if (pos.array[i] < 0) pos.array[i] = 30;
+                    }
+                    this.objects.particles.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Slow relax camera breathing orbit if Relax Mode active
+                if (document.body.classList.contains('relax-mode')) {
+                    this.camera.position.x = Math.sin(time * 0.1) * 8.0;
+                    this.camera.position.z = 30 + Math.cos(time * 0.1) * 4.0;
+                    this.camera.lookAt(0, 0, 0);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        /* ============================================================
+           4. GSAP STORY SCROLL CHOREOGRAPHY
+           ============================================================ */
+        class StoryController {
+            constructor(engine) {
+                this.engine = engine;
+                this.currentIndex = 0;
+                this.isRelaxMode = false;
+
+                this.initLoader();
+                this.initScroll();
+                this.initUIEvents();
+            }
+
+            initLoader() {
+                let progress = 0;
+                const fill = document.getElementById('loader-fill');
+                const interval = setInterval(() => {
+                    progress += Math.random() * 25;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        gsap.to('#loader', {
+                            opacity: 0,
+                            duration: 1.5,
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                document.getElementById('loader').style.display = 'none';
+                            }
+                        });
+                    }
+                    fill.style.width = `${progress}%`;
+                }, 150);
+            }
+
+            initScroll() {
+                gsap.registerPlugin(ScrollTrigger);
+
+                const proxy = document.getElementById('scroll-proxy');
+                const numEnvs = ENVIRONMENTS.length;
+
+                ENVIRONMENTS.forEach((env, idx) => {
+                    if (idx === 0) return; // First scene initialized
+
+                    const startRatio = (idx / numEnvs);
+                    
+                    ScrollTrigger.create({
+                        trigger: proxy,
+                        start: `${startRatio * 100}% top`,
+                        end: `${((idx + 1) / numEnvs) * 100}% top`,
+                        onEnter: () => this.transitionToEnv(idx),
+                        onEnterBack: () => this.transitionToEnv(idx - 1)
+                    });
+                });
+
+                // Camera Path Scroll Timeline
+                gsap.timeline({
+                    scrollTrigger: {
+                        trigger: proxy,
+                        start: "top top",
+                        end: "bottom bottom",
+                        scrub: 1.5
+                    }
+                })
+                .to(this.engine.camera.position, { z: 10, y: 2, ease: "none" })
+                .to(this.engine.camera.position, { x: 15, z: 25, y: 6, ease: "none" })
+                .to(this.engine.camera.position, { x: -10, z: 15, y: 3, ease: "none" })
+                .to(this.engine.camera.position, { x: 0, z: 35, y: 5, ease: "none" });
+            }
+
+            transitionToEnv(idx) {
+                if (this.currentIndex === idx) return;
+                this.currentIndex = idx;
+                const env = ENVIRONMENTS[idx];
+
+                // Update UI text
+                gsap.to('#hud-environment', {
+                    opacity: 0,
+                    y: 10,
+                    duration: 0.4,
+                    onComplete: () => {
+                        document.getElementById('env-number').textContent = `${env.id} / 08 SANCTUARY`;
+                        document.getElementById('env-title').textContent = env.title;
+                        document.getElementById('env-subtitle').textContent = env.subtitle;
+                        gsap.to('#hud-environment', { opacity: 1, y: 0, duration: 0.6 });
+                    }
+                });
+
+                // Update Scrubber Dots
+                document.querySelectorAll('.dot-item').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === idx);
+                });
+
+                // Animate Shader / Atmosphere Interpolation
+                const sky = this.engine.uniforms.sky;
+                gsap.to(sky.uSkyTop.value, { r: env.skyTop.r, g: env.skyTop.g, b: env.skyTop.b, duration: 2 });
+                gsap.to(sky.uSkyBottom.value, { r: env.skyBottom.r, g: env.skyBottom.g, b: env.skyBottom.b, duration: 2 });
+                gsap.to(sky.uSunPosition.value, { x: env.sunPos.x, y: env.sunPos.y, z: env.sunPos.z, duration: 2 });
+                gsap.to(sky.uSunColor.value, { r: env.sunColor.r, g: env.sunColor.g, b: env.sunColor.b, duration: 2 });
+                gsap.to(sky.uMoonPosition.value, { x: env.moonPos.x, y: env.moonPos.y, z: env.moonPos.z, duration: 2 });
+                gsap.to(sky.uMoonColor.value, { r: env.moonColor.r, g: env.moonColor.g, b: env.moonColor.b, duration: 2 });
+                gsap.to(sky.uStarOpacity, { value: env.starOpacity, duration: 2 });
+                gsap.to(sky.uAuroraAlpha, { value: env.auroraAlpha, duration: 2 });
+
+                // Fog & Water Color Transition
+                gsap.to(this.engine.scene.fog.color, { r: env.fogColor.r, g: env.fogColor.g, b: env.fogColor.b, duration: 2 });
+                gsap.to(this.engine.objects.water.material.color, { r: env.waterColor.r, g: env.waterColor.g, b: env.waterColor.b, duration: 2 });
+                gsap.to(this.engine.objects.water.material, { opacity: env.waterAlpha, duration: 2 });
+
+                // Audio modulation
+                audioApp.updateForEnvironment(idx);
+            }
+
+            initUIEvents() {
+                // Audio Toggle
+                document.getElementById('btn-audio').addEventListener('click', () => audioApp.toggle());
+
+                // Relax Mode Toggle
+                const btnRelax = document.getElementById('btn-relax');
+                const btnRelaxExit = document.getElementById('relax-exit-btn');
+                
+                const toggleRelax = (enable) => {
+                    this.isRelaxMode = enable;
+                    document.body.classList.toggle('relax-mode', enable);
+                    btnRelax.classList.toggle('active', enable);
+                };
+
+                btnRelax.addEventListener('click', () => toggleRelax(true));
+                btnRelaxExit.addEventListener('click', () => toggleRelax(false));
+
+                // Memorial Tribute Modal
+                const tributeModal = document.getElementById('tribute-modal');
+                document.getElementById('btn-tribute').addEventListener('click', () => {
+                    tributeModal.classList.add('open');
+                });
+                document.getElementById('btn-close-tribute').addEventListener('click', () => {
+                    tributeModal.classList.remove('open');
+                });
+
+                // Scrubber Dot Clicks
+                document.querySelectorAll('.dot-item').forEach((dot) => {
+                    dot.addEventListener('click', (e) => {
+                        const targetIdx = parseInt(e.target.getAttribute('data-index'));
+                        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+                        const targetScroll = (targetIdx / ENVIRONMENTS.length) * totalHeight;
+                        window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+                    });
+                });
+            }
+        }
+
+        /* ============================================================
+           5. INITIALIZATION
+           ============================================================ */
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!window.WebGLRenderingContext) {
+                document.body.classList.add('no-webgl');
+                return;
+            }
+
+            const engine = new SanctuaryEngine();
+            const controller = new StoryController(engine);
+        });
+    </script>
+</body>
+</html>
