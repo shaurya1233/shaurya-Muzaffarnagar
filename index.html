@@ -442,6 +442,200 @@
             #hud-nav-dots { right: 1.5rem; }
         }
     </style>
+
+    <!-- ADDED FEATURES CSS -->
+    <style>
+        /* INTRO SEQUENCE CSS */
+        #custom-intro-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #050507;
+            z-index: 100000; /* Extremely high to cover everything on first entry */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .intro-images {
+            display: flex;
+            flex-direction: row;
+            gap: 4rem;
+            max-width: 90vw;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .intro-img {
+            height: 55vh;
+            width: auto;
+            max-width: 40vw;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* MUSIC PLAYER CSS */
+        .added-music-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #F7F3EE;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .added-music-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .added-music-panel {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 2rem;
+            width: 300px;
+            background: rgba(5, 5, 7, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+        }
+        .added-music-panel.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .yt-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #D4AF37;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .yt-close-btn {
+            background: none;
+            border: none;
+            color: #F7F3EE;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .yt-close-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .yt-tracklist {
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem;
+        }
+
+        .yt-track-btn {
+            background: none;
+            border: none;
+            color: rgba(247, 243, 238, 0.7);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        .yt-track-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #F7F3EE;
+        }
+        .yt-track-btn.active {
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.08);
+            border-left: 2px solid #D4AF37;
+        }
+        .yt-stop-btn {
+            color: #E8B4B8;
+            margin-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0;
+            text-align: center;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+        }
+        .yt-stop-btn:hover {
+            color: #F7F3EE;
+            background: rgba(232, 180, 184, 0.15);
+        }
+
+        .yt-player-container {
+            width: 100%;
+            height: 180px; 
+            background: #000;
+            display: none; 
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .yt-player-container.active {
+            display: block;
+        }
+
+        /* Responsive Adjustments for Additions */
+        @media (max-width: 768px) {
+            .intro-images {
+                flex-direction: column;
+                gap: 2rem;
+            }
+            .intro-img {
+                height: auto;
+                width: 75vw;
+                max-height: 40vh;
+            }
+            .added-music-btn {
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+            .added-music-panel {
+                bottom: 4.5rem;
+                right: 1.5rem;
+                width: 270px;
+            }
+            .yt-player-container {
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -1214,6 +1408,113 @@
 
             const engine = new SanctuaryEngine();
             const controller = new StoryController(engine);
+        });
+    </script>
+
+    <!-- ADDED: FIRST-ENTRY PERSONAL INTRO -->
+    <div id="custom-intro-layer">
+        <div class="intro-images">
+            <img src="shauryajpg.jpg" alt="Shaurya" class="intro-img">
+            <img src="rakeshjpg.jpg" alt="Rakesh Goyal Ji — My Nana" class="intro-img">
+        </div>
+    </div>
+
+    <!-- ADDED: MUSIC CONTROLS & PLAYER -->
+    <button id="yt-music-toggle" class="added-music-btn">♫ MUSIC</button>
+
+    <div id="yt-music-panel" class="added-music-panel">
+        <div class="yt-panel-header">
+            <span style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Cinematic Audio</span>
+            <button id="yt-music-close" class="yt-close-btn" title="Close">✕</button>
+        </div>
+        
+        <div class="yt-tracklist">
+            <button class="yt-track-btn" data-ytid="TCUmOaLQ3gg">Dil Diya Hai — Desh</button>
+            <button class="yt-track-btn" data-ytid="7dO_MS9tZ5E">Dekha Ek Khwaab</button>
+            <button class="yt-track-btn" data-ytid="e2D-kjOMNF0">Tu Pyaar Ka Sagar</button>
+            <button class="yt-track-btn yt-stop-btn">Stop Audio / Off</button>
+        </div>
+
+        <div class="yt-player-container">
+            <iframe id="yt-iframe" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- ADDED FEATURES LOGIC -->
+    <script>
+        // Intro Sequence Logic
+        window.addEventListener('load', () => {
+            const introLayer = document.getElementById('custom-intro-layer');
+            const introImages = document.querySelector('.intro-images');
+            
+            // Fade in the images shortly after load
+            setTimeout(() => {
+                if(introImages) introImages.style.opacity = '1';
+            }, 500); 
+            
+            // Hold and then fade out the entire layer
+            setTimeout(() => {
+                if(introImages) introImages.style.opacity = '0';
+                if(introLayer) introLayer.style.opacity = '0';
+            }, 4500); 
+            
+            // Remove interaction and hide
+            setTimeout(() => {
+                if(introLayer) {
+                    introLayer.style.pointerEvents = 'none';
+                    introLayer.style.display = 'none';
+                }
+            }, 6000);
+        });
+
+        // Music Player & Control Logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const toggleBtn = document.getElementById('yt-music-toggle');
+            const panel = document.getElementById('yt-music-panel');
+            const closeBtn = document.getElementById('yt-music-close');
+            const trackBtns = document.querySelectorAll('.yt-track-btn:not(.yt-stop-btn)');
+            const stopBtn = document.querySelector('.yt-stop-btn');
+            const iframe = document.getElementById('yt-iframe');
+            const playerContainer = document.querySelector('.yt-player-container');
+
+            let isPanelOpen = false;
+
+            toggleBtn.addEventListener('click', () => {
+                isPanelOpen = !isPanelOpen;
+                if (isPanelOpen) {
+                    panel.classList.add('open');
+                } else {
+                    panel.classList.remove('open');
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                isPanelOpen = false;
+                panel.classList.remove('open');
+            });
+
+            trackBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    trackBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Load iframe
+                    const videoId = btn.getAttribute('data-ytid');
+                    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+                    playerContainer.classList.add('active');
+                    
+                    // Show subtle ON state on toggle button
+                    toggleBtn.innerHTML = '♫ ON';
+                });
+            });
+
+            stopBtn.addEventListener('click', () => {
+                trackBtns.forEach(b => b.classList.remove('active'));
+                iframe.src = '';
+                playerContainer.classList.remove('active');
+                toggleBtn.innerHTML = '♫ OFF';
+            });
         });
     </script>
 </body>
